@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "rag-plug"
+version = "0.1.0"
+description = "RAG client"
+authors = ["George K <george@dormint.io>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+openai-agents = "^0.9.2"
+httpx = "^0.28.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
