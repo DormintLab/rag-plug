@@ -1,0 +1,45 @@
+version: "3"
+dotenv: ['.env']
+vars:
+  RUNNER: ""
+  SOURCES: ragplug scripts
+  SOURCES_ROOT: ragplug
+  VERSION:
+    sh: poetry version -s
+
+tasks:
+  lint:
+    desc: Lint python source files
+    cmds:
+      - "{{.RUNNER}} ruff check --fix {{.SOURCES}}"
+  format:
+    desc: Format python source files
+    aliases: ["fmt"]
+    cmds:
+      - "{{.RUNNER}} python -m ruff format {{.SOURCES}} "
+      - "{{.RUNNER}} python -m isort {{.SOURCES}}"
+  typecheck:
+    desc: Perform type-checking
+    cmd: "{{.RUNNER}} python -m mypy {{.SOURCES}}"
+  clean:
+    desc: Remove all __pycache__ dirs
+    cmd: "{{.RUNNER}} python -m pyclean ."
+
+  release:
+    desc: Release current version to production
+    cmds:
+      - "{{.RUNNER}} git tag v{{.VERSION}}"
+      - "{{.RUNNER}} git push --tags"
+
+  unrelease:
+    desc: Release current version to production
+    cmds:
+      - "{{.RUNNER}} git tag -d v{{.VERSION}}"
+      - "{{.RUNNER}} git push origin :refs/tags/v{{.VERSION}}"
+
+  all:
+    desc: Run the standard set of checks performed in CI
+    cmds:
+      - task: format
+      - task: clean
+      - task: lint
