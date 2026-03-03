@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "RAG client"
 authors = ["George K <george@dormint.io>"]
 readme = "README.md"
+packages = [{ include = "ragplug" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
