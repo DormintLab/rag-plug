@@ -1,7 +1,7 @@
 # rag-plug
 
 Python client for the RAGPlug backend API.
-It supports adding memory items, semantic search, and deleting items by ID (sync and async).
+It supports adding documents to memory, semantic search, schema retrieval, and deleting items by ID (sync and async).
 
 ## Features
 - `RagPlug` client with typed response models.
@@ -41,11 +41,14 @@ from ragplug import RagPlug
 client = RagPlug(api_key="YOUR_API_KEY", default_memory_name="main")
 
 item = client.add(
-    "Paris is the capital of France",
-    metadata={"source": "docs"},
+    {
+        "text": "Paris is the capital of France",
+        "source": "docs",
+    }
 )
 
-response = client.search("capital of France", top_k=3)
+response = client.search("capital of France", field_name="text", top_k=3)
+schema = client.schema()
 client.delete(item.id)
 ```
 
@@ -57,8 +60,8 @@ from ragplug import RagPlug
 
 async def main() -> None:
     client = RagPlug(api_key="YOUR_API_KEY", default_memory_name="main")
-    item = await client.aadd("Async memory text")
-    response = await client.asearch("Async memory", top_k=3)
+    item = await client.aadd({"text": "Async memory text"})
+    response = await client.asearch("Async memory", field_name="text", top_k=3)
     await client.adelete(item.id)
     print(response.results)
 
@@ -91,13 +94,14 @@ set -a; source .env; set +a
 poetry run python scripts/add_memory.py \
   --api-key "$API_KEY" \
   --memory-name "$MEMORY_NAME" \
-  --text "Smoke test memory" \
-  --metadata '{"source":"scripts"}'
+  --document '{"text":"Smoke test memory","source":"scripts"}'
 
 poetry run python scripts/search.py \
   --api-key "$API_KEY" \
   --memory-name "$MEMORY_NAME" \
   --query "Smoke test" \
+  --field-name "text" \
+  --mode "naive" \
   --top-k 5
 ```
 

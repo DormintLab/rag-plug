@@ -19,12 +19,18 @@ def main() -> None:
     client = RagPlug(api_key=api_key, default_memory_name=memory_name)
 
     item = client.add(
-        text="Paris is the capital of France",
-        metadata={"source": "examples/sync_usage.py"},
+        document={
+            "text": "Paris is the capital of France",
+            "source": "examples/sync_usage.py",
+        },
     )
     print(f"Added: {item.id}")
 
-    response = client.search(query="capital of France", top_k=3)
+    response = client.search(
+        query="capital of France",
+        field_name="text",
+        top_k=3,
+    )
     for row in response.results:
         print(f"{row.id} | score={row.score:.4f} | text={row.text}")
 

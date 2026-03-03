@@ -6,7 +6,7 @@ from ragplug._api import _RagPlugApi
 from ragplug._response_parser import _ResponseParser
 from ragplug._transport import _HttpTransport
 from ragplug._validation import _Validator
-from ragplug.types import MemoryDeleteResult, MemoryItem, SearchResponse
+from ragplug.types import MemoryDeleteResult, MemoryItem, SearchMode, SearchResponse
 
 
 class RagPlug:
@@ -42,19 +42,25 @@ class RagPlug:
         data = await self._api.aversion()
         return _ResponseParser.version(data)
 
+    def schema(self, memory_name: Optional[str] = None) -> Any:
+        resolved_memory_name = self._memory_name(memory_name)
+        return self._api.memory_schema(resolved_memory_name)
+
+    async def aschema(self, memory_name: Optional[str] = None) -> Any:
+        resolved_memory_name = self._memory_name(memory_name)
+        return await self._api.amemory_schema(resolved_memory_name)
+
     def add(
         self,
-        text: str,
+        document: Dict[str, Any],
         memory_name: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
         item_id: Optional[str] = None,
     ) -> MemoryItem:
-        _Validator.require_non_empty(text, "text")
+        _Validator.validate_document(document)
         resolved_memory_name = self._memory_name(memory_name)
 
         payload: Dict[str, Any] = {
-            "text": text,
-            "metadata": metadata or {},
+            "document": document,
             "id": item_id,
         }
         data = self._api.add_memory(resolved_memory_name, payload)
@@ -62,17 +68,15 @@ class RagPlug:
 
     async def aadd(
         self,
-        text: str,
+        document: Dict[str, Any],
         memory_name: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
         item_id: Optional[str] = None,
     ) -> MemoryItem:
-        _Validator.require_non_empty(text, "text")
+        _Validator.validate_document(document)
         resolved_memory_name = self._memory_name(memory_name)
 
         payload: Dict[str, Any] = {
-            "text": text,
-            "metadata": metadata or {},
+            "document": document,
             "id": item_id,
         }
         data = await self._api.aadd_memory(resolved_memory_name, payload)
@@ -95,27 +99,49 @@ class RagPlug:
     def search(
         self,
         query: str,
+        field_name: str,
         top_k: int = 5,
+        mode: SearchMode = "naive",
+        enable_rerank: bool = False,
         memory_name: Optional[str] = None,
     ) -> SearchResponse:
         _Validator.require_non_empty(query, "query")
+        _Validator.require_non_empty(field_name, "field_name")
         _Validator.validate_top_k(top_k)
+        _Validator.validate_mode(mode)
         resolved_memory_name = self._memory_name(memory_name)
 
-        payload = {"query": query, "top_k": top_k}
+        payload = {
+            "query": query,
+            "top_k": top_k,
+            "field_name": field_name,
+            "mode": mode,
+            "enable_rerank": bool(enable_rerank),
+        }
         data = self._api.search_memory(resolved_memory_name, payload)
         return _ResponseParser.search(data)
 
     async def asearch(
         self,
         query: str,
+        field_name: str,
         top_k: int = 5,
+        mode: SearchMode = "naive",
+        enable_rerank: bool = False,
         memory_name: Optional[str] = None,
     ) -> SearchResponse:
         _Validator.require_non_empty(query, "query")
+        _Validator.require_non_empty(field_name, "field_name")
         _Validator.validate_top_k(top_k)
+        _Validator.validate_mode(mode)
         resolved_memory_name = self._memory_name(memory_name)
 
-        payload = {"query": query, "top_k": top_k}
+        payload = {
+            "query": query,
+            "top_k": top_k,
+            "field_name": field_name,
+            "mode": mode,
+            "enable_rerank": bool(enable_rerank),
+        }
         data = await self._api.asearch_memory(resolved_memory_name, payload)
         return _ResponseParser.search(data)

@@ -28,6 +28,14 @@ class _RagPlugApi:
         path = f"/memory/{self._segment(memory_name)}"
         return await self._transport.arequest_json("POST", path, payload=payload)
 
+    def memory_schema(self, memory_name: str) -> Dict[str, Any]:
+        path = f"/memory/{self._segment(memory_name)}/schema"
+        return self._transport.request_json("GET", path)
+
+    async def amemory_schema(self, memory_name: str) -> Dict[str, Any]:
+        path = f"/memory/{self._segment(memory_name)}/schema"
+        return await self._transport.arequest_json("GET", path)
+
     def delete_memory(self, memory_name: str, item_id: str) -> Dict[str, Any]:
         path = f"/memory/{self._segment(memory_name)}/{self._segment(item_id)}"
         return self._transport.request_json("DELETE", path)

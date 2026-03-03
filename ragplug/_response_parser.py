@@ -13,30 +13,39 @@ from ragplug.types import (
 
 class _ResponseParser:
     @staticmethod
-    def version(data: Dict[str, Any]) -> str:
-        version_value = data.get("version")
+    def _ensure_dict(data: Any, endpoint: str) -> Dict[str, Any]:
+        if not isinstance(data, dict):
+            raise RagPlugError(f"Unexpected {endpoint} response format")
+        return data
+
+    @staticmethod
+    def version(data: Any) -> str:
+        payload = _ResponseParser._ensure_dict(data, "/version")
+        version_value = payload.get("version")
         if version_value is None:
             raise RagPlugError("Unexpected /version response format")
         return str(version_value)
 
     @staticmethod
-    def memory_item(data: Dict[str, Any]) -> MemoryItem:
+    def memory_item(data: Any) -> MemoryItem:
+        payload = _ResponseParser._ensure_dict(data, "/memory")
         return MemoryItem(
-            id=str(data.get("id", "")),
-            text=str(data.get("text", "")),
-            metadata=data.get("metadata") if isinstance(data.get("metadata"), dict) else {},
+            id=str(payload.get("id", "")),
+            document=payload.get("document") if isinstance(payload.get("document"), dict) else {},
         )
 
     @staticmethod
-    def memory_delete(data: Dict[str, Any], item_id: str) -> MemoryDeleteResult:
+    def memory_delete(data: Any, item_id: str) -> MemoryDeleteResult:
+        payload = _ResponseParser._ensure_dict(data, "/memory/{memory_name}/{item_id}")
         return MemoryDeleteResult(
-            id=str(data.get("id", item_id)),
-            deleted=bool(data.get("deleted", False)),
+            id=str(payload.get("id", item_id)),
+            deleted=bool(payload.get("deleted", False)),
         )
 
     @staticmethod
-    def search(data: Dict[str, Any]) -> SearchResponse:
-        raw_results = data.get("results")
+    def search(data: Any) -> SearchResponse:
+        payload = _ResponseParser._ensure_dict(data, "/search/{memory_name}")
+        raw_results = payload.get("results")
         results: List[SearchResult] = []
 
         if isinstance(raw_results, list):
@@ -52,4 +61,4 @@ class _ResponseParser:
                     )
                 )
 
-        return SearchResponse(query=str(data.get("query", "")), results=results)
+        return SearchResponse(query=str(payload.get("query", "")), results=results)

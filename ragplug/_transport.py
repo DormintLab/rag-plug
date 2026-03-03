@@ -29,7 +29,7 @@ class _HttpTransport:
         method: str,
         path: str,
         payload: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+    ) -> Any:
         try:
             with httpx.Client(timeout=self.timeout, headers=self.headers) as client:
                 response = client.request(method, self._url(path), json=payload)
@@ -37,14 +37,14 @@ class _HttpTransport:
             _ErrorHandler.raise_network_error(error)
 
         _ErrorHandler.raise_for_http_error(response)
-        return _ErrorHandler.parse_json_dict(response)
+        return _ErrorHandler.parse_json_response(response)
 
     async def arequest_json(
         self,
         method: str,
         path: str,
         payload: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+    ) -> Any:
         try:
             async with httpx.AsyncClient(timeout=self.timeout, headers=self.headers) as client:
                 response = await client.request(method, self._url(path), json=payload)
@@ -52,4 +52,4 @@ class _HttpTransport:
             _ErrorHandler.raise_network_error(error)
 
         _ErrorHandler.raise_for_http_error(response)
-        return _ErrorHandler.parse_json_dict(response)
+        return _ErrorHandler.parse_json_response(response)

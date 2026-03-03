@@ -20,12 +20,18 @@ async def main() -> None:
     client = RagPlug(api_key=api_key, default_memory_name=memory_name)
 
     item = await client.aadd(
-        text="Async example memory",
-        metadata={"source": "examples/async_usage.py"},
+        document={
+            "text": "Async example memory",
+            "source": "examples/async_usage.py",
+        },
     )
     print(f"Added: {item.id}")
 
-    response = await client.asearch(query="Async example", top_k=3)
+    response = await client.asearch(
+        query="Async example",
+        field_name="text",
+        top_k=3,
+    )
     for row in response.results:
         print(f"{row.id} | score={row.score:.4f} | text={row.text}")
 

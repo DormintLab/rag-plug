@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
+
+SearchMode = Literal["local", "global", "hybrid", "naive", "mix", "bypass"]
 
 
 @dataclass(slots=True)
 class MemoryItem:
     id: str
-    text: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    document: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(slots=True)

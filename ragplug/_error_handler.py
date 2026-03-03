@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 import httpx
 
@@ -29,7 +29,7 @@ class _ErrorHandler:
         raise RagPlugError(f"Network error: {error}") from error
 
     @staticmethod
-    def parse_json_dict(response: httpx.Response) -> Dict[str, Any]:
+    def parse_json_response(response: httpx.Response) -> Any:
         try:
             data = response.json()
         except ValueError as error:
@@ -38,9 +38,4 @@ class _ErrorHandler:
                 status_code=response.status_code,
             ) from error
 
-        if not isinstance(data, dict):
-            raise RagPlugError(
-                "Unexpected response format",
-                status_code=response.status_code,
-            )
         return data

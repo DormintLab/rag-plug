@@ -3,6 +3,7 @@ from .types import (
     MemoryDeleteResult,
     MemoryItem,
     RagPlugError,
+    SearchMode,
     SearchResponse,
     SearchResult,
 )
@@ -12,6 +13,7 @@ __all__ = [
     "RagPlugError",
     "MemoryItem",
     "MemoryDeleteResult",
+    "SearchMode",
     "SearchResult",
     "SearchResponse",
 ]
