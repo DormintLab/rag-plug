@@ -10,7 +10,7 @@ from ragplug.types import MemoryDeleteResult, MemoryItem, SearchMode, SearchResp
 
 
 class RagPlug:
-    endpoint_url = "https://api-ragplug.dormint.io"
+    endpoint_url = "https://api-rag.swarm.ing"
 
     def __init__(
         self,
